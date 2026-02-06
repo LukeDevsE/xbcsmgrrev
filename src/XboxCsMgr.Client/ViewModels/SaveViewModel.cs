@@ -74,13 +74,23 @@ namespace XboxCsMgr.Client.ViewModels
 
         private async void FetchSaveMetadata()
         {
-            TitleStorageBlobMetadataResult blobMetadataResult = await _storageService.GetBlobMetadata();
-            if (blobMetadataResult != null && blobMetadataResult.Blobs != null)
+            try
             {
-                foreach (TitleStorageBlobMetadata entry in blobMetadataResult.Blobs)
+                TitleStorageBlobMetadataResult blobMetadataResult = await _storageService.GetBlobMetadata();
+                if (blobMetadataResult != null && blobMetadataResult.Blobs != null)
                 {
-                    _saveData.Add(new SavedBlobsViewModel(_storageService, entry));
+                    foreach (TitleStorageBlobMetadata entry in blobMetadataResult.Blobs)
+                    {
+                        _saveData.Add(new SavedBlobsViewModel(_storageService, entry));
+                    }
                 }
+            }
+            catch
+            {
+                var fakemetadata = new TitleStorageBlobMetadata();
+                fakemetadata.FileName = "No saves found.";
+                var fakesave = new SavedBlobsViewModel(_storageService, fakemetadata);
+                _saveData.Add(fakesave);
             }
         }
 
