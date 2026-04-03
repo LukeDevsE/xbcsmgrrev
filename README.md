@@ -6,6 +6,10 @@ Xbox Connected Storage Manager Revived
 ### Preview
 ![Application Screenshot](assets/screenshot_example.png)
 
+## Todo
+- [ ] Replace the login system with a code based system to be easier for the end user.
+- [ ] Make the folder (blob) name accurate
+- [ ] Hide games from the left that don't have any saves.
 ## How to login
 1. press the Open Link button on the dialog when you open the program.
 2. Click authorize
