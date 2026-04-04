@@ -24,14 +24,14 @@ namespace XboxCsMgr.Client
         {
             InitializeComponent();
         }
-
+        public string usercodething = "";
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            Process.Start(new ProcessStartInfo("https://login.live.com/oauth20_authorize.srf?client_id=c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb&response_type=code&approval_prompt=auto&scope=Xboxlive.signin+Xboxlive.offline_access") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo("https://www.microsoft.com/link?otc=" + usercodething) { UseShellExecute = true });
         }
     }
 }

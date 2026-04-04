@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Input;
 using XboxCsMgr.Client.ViewModels.Controls;
 using XboxCsMgr.XboxLive;
 using XboxCsMgr.XboxLive.Model.TitleStorage;
@@ -74,6 +75,7 @@ namespace XboxCsMgr.Client.ViewModels
 
         private async void FetchSaveMetadata()
         {
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
             try
             {
                 TitleStorageBlobMetadataResult blobMetadataResult = await _storageService.GetBlobMetadata();
@@ -88,10 +90,11 @@ namespace XboxCsMgr.Client.ViewModels
             catch
             {
                 var fakemetadata = new TitleStorageBlobMetadata();
-                fakemetadata.FileName = "No saves found.";
+                fakemetadata.DisplayName = "No saves found.";
                 var fakesave = new SavedBlobsViewModel(_storageService, fakemetadata);
                 _saveData.Add(fakesave);
             }
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
         }
 
         public void SelectedItemChanged(object args)

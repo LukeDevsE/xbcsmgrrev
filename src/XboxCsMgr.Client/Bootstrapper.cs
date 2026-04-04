@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using Stylet;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -22,37 +23,43 @@ namespace XboxCsMgr.Client
 
         private AuthenticateService authenticateService;
         //private string DeviceToken { get; set; }
-        private string UserToken = "";
-        public string CLIENT_ID = "c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb";
+        //private string UserToken = "";
+        public static string CLIENT_ID = "c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb";
         protected override void ConfigureIoC(StyletIoC.IStyletIoCBuilder builder)
         {
             base.ConfigureIoC(builder);
 
             builder.Bind<IDialogFactory>().ToAbstractFactory();
         }
-
+        // tenant set to common for now
+        public static HttpClient devicecode = new HttpClient();
         protected override async void OnStart()
         {
             Debug.WriteLine("Start program");
             var dialog = new Dialogue();
             await Task.Yield();
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Post, $"https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode");
+            req.Method = HttpMethod.Post;
+            req.Content = new StringContent($"client_id={CLIENT_ID}&scope=Xboxlive.signin%20Xboxlive.offline_access", System.Text.Encoding.UTF8, "application/x-www-form-urlencoded"); // have fun anyone looking at this crappy code
+            HttpResponseMessage devicecoderesponse = await devicecode.SendAsync(req);
+            string content = await devicecoderesponse.Content.ReadAsStringAsync();
+            dynamic usercode = JsonConvert.DeserializeObject(content);
+            dialog.usercodething = usercode["user_code"];
+            dialog.txtQuestion.Text = "Open https://www.microsoft.com/link and enter the code " + usercode["user_code"];
             dialog.ShowDialog();
-            string code = dialog.txtResponse.Text;
-            MicrosoftOAuth oauth = new MicrosoftOAuth(CLIENT_ID, "Xboxlive.signin Xboxlive.offline_access",new HttpClient());
-            MicrosoftOAuthCode code2 = new MicrosoftOAuthCode();
-            code2.Code = code;
-            Debug.WriteLine("Getting Access Token");
-            var codes = await oauth.GetTokens(code2);
-            authenticateService = new AuthenticateService(XblConfig);
-            Debug.WriteLine("Getting User Token");
-            var finaltoken = await authenticateService.AuthenticateUser(codes.AccessToken,"d=");
-            UserToken = finaltoken.Token;
-            Debug.WriteLine("Authorizing");
             //LoadXblTokenCredentials();
-            var result = await authenticateService.AuthorizeXsts(UserToken);
+            HttpRequestMessage req2 = new HttpRequestMessage(HttpMethod.Post, $"https://login.microsoftonline.com/consumers/oauth2/v2.0/token");
+            req2.Method = HttpMethod.Post;
+            req2.Content = new StringContent($"grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id={CLIENT_ID}&device_code={usercode["device_code"]}", System.Text.Encoding.UTF8, "application/x-www-form-urlencoded"); // have fun anyone looking at this crappy code
+            HttpResponseMessage tokenresponse = await devicecode.SendAsync(req2);
+            string content2 = await tokenresponse.Content.ReadAsStringAsync();
+            dynamic tokencode = JsonConvert.DeserializeObject(content2);
+            authenticateService = new AuthenticateService(XblConfig);
+            var finaltoken = await authenticateService.AuthenticateUser(tokencode["access_token"].ToString(), "d=");
+            var result = await authenticateService.AuthorizeXsts(finaltoken.Token);
             if (result != null)
             {
-                Debug.WriteLine("Authorized! Token: " + result.Token);
+                //Debug.WriteLine("Authorized! Token: " + result.Token);
                 XblConfig = new XboxLiveConfig(result.Token, result.DisplayClaims.XboxUserIdentity[0]);
                 this.RootViewModel.OnAuthComplete();
             }
@@ -87,7 +94,7 @@ namespace XboxCsMgr.Client
                     }
                     else if (credential.Key.Contains("Utoken"))
                     {
-                        if (token.TokenData.Token != "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") UserToken = token.TokenData.Token;
+                        //if (token.TokenData.Token != "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") UserToken = token.TokenData.Token;
                     }
                 }
             }

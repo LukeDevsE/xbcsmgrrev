@@ -45,9 +45,9 @@
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type vmc:SavedBlobsViewModel}" ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Height="20">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Height="20" ToolTip="{Binding BlobName}">
                             <ContentControl Template="{Binding Converter={StaticResource HierarchyNodeToIconConverter}}"/>
-                            <TextBlock Text="{Binding BlobName}" FontSize="12"/>
+                            <TextBlock Text="{Binding BlobDisplayName}" FontSize="12"/>
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Download" Command="{s:Action DownloadFolder}"/>

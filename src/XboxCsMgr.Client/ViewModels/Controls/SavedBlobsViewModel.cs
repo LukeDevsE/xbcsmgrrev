@@ -1,4 +1,7 @@
-﻿using XboxCsMgr.XboxLive.Model.TitleStorage;
+﻿using System;
+using System.Diagnostics;
+using System.Drawing.Printing;
+using XboxCsMgr.XboxLive.Model.TitleStorage;
 using XboxCsMgr.XboxLive.Services;
 
 namespace XboxCsMgr.Client.ViewModels.Controls
@@ -16,6 +19,21 @@ namespace XboxCsMgr.Client.ViewModels.Controls
         public string BlobName
         {
             get => _blobMetadata.FileName;
+        }
+        public string BlobDisplayName
+        {
+            get
+            {
+                if (_blobMetadata.DisplayName != null)
+                {
+                    Debug.WriteLine(_blobMetadata.DisplayName.Length);
+                    return _blobMetadata.DisplayName;
+                }
+                else
+                {
+                    return _blobMetadata.FileName;
+                }  
+            }
         }
 
         public SavedBlobsViewModel(TitleStorageService storageService, TitleStorageBlobMetadata blobMetadata) : base(null, true)

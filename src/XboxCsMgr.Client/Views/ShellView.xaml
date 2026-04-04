@@ -6,7 +6,7 @@
         xmlns:s="https://github.com/canton7/Stylet"
         xmlns:local="clr-namespace:XboxCsMgr.Client.Views"
         mc:Ignorable="d"
-        Title="Xbox Connected Storage Manager"
+        Title="Xbox Connected Storage Manager Revived"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
         Height="450" Width="800">
     <Grid>
