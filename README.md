@@ -7,8 +7,9 @@ Xbox Connected Storage Manager Revived
 ![Application Screenshot](assets/screenshot_example.png)
 
 ## Todo
-- [ ] Replace the login system with a code based system to be easier for the end user.
-- [ ] Make the folder (blob) name accurate
+- [x] Replace the login system with a code based system to be easier for the end user.
+- [x] Make the folder (blob) name accurate
+- [ ] Save refresh token somewhere, so you dont need to keep logging in.
 - [ ] Make better looking ui
 ## How to login
 1. press the Open Link button on the dialog when you open the program.
