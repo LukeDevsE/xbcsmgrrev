@@ -34,3 +34,4 @@ I believe that everyone has the right to access their game save data on the game
 ## Credits/References
 - [XboxAuthNet](https://github.com/AlphaBs/XboxAuthNet)
 - [Prism Launcher for OAuth](https://prismlauncher.org/)
+- [Original xbcsmgr](https://github.com/billynothingelse/xbcsmgr)
