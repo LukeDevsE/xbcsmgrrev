@@ -1,9 +1,11 @@
 ﻿using Stylet;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -87,7 +89,7 @@ namespace XboxCsMgr.Client.ViewModels
                     foreach (TitleStorageBlobMetadata entry in blobMetadataResult.Blobs)
                     {
                         SavedBlobsViewModel sbvm = new SavedBlobsViewModel(_storageService, entry);
-                        if (_storageService.PackageFamilyName == "Microsoft.ArthurProduct_8wekyb3d8bbwe")
+                        if (_storageService.PackageFamilyName == "Microsoft.ArthurProduct_8wekyb3d8bbwe" && entry.DisplayName != null)
                         {
                             sbvm.ShowFolderIcon = Visibility.Collapsed;
                             sbvm.ShowImage = Visibility.Visible;
@@ -98,29 +100,13 @@ namespace XboxCsMgr.Client.ViewModels
                 Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
                 foreach (SavedBlobsViewModel entry in _saveData)
                 {
-                    if (entry == null)
-                    {
-                        break;
-                    }
                     if (_storageService.PackageFamilyName == "Microsoft.ArthurProduct_8wekyb3d8bbwe")
                     {
-                        var allatoms = await _storageService.GetBlobAtoms(entry.BlobName);
-                        string atomvalue = "";
-                        foreach (var atom in allatoms.Atoms)
+                        Thread thread = new Thread(delegate ()
                         {
-                            if (atom.Key == "THUMB")
-                            {
-                                atomvalue = atom.Value;
-                                break;
-                            }
-                        }
-                        if (atomvalue != "" && entry != null)
-                        {
-                            byte[] atomData = await _storageService.DownloadAtomAsync(atomvalue);
-                            PngBitmapDecoder decoder = new PngBitmapDecoder(new MemoryStream(atomData), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-                            BitmapSource bms = decoder.Frames[0];
-                            entry.ImageURI = bms;
-                        }
+                            DisplayImage(entry);
+                        });
+                        thread.Start();
                     }
                 }
             }
@@ -133,7 +119,53 @@ namespace XboxCsMgr.Client.ViewModels
             }
             Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
         }
+        //public Dictionary<string, BitmapSource> displaycache = new Dictionary<string, BitmapSource>();
 
+        private async void DisplayImage(SavedBlobsViewModel entry)
+        {
+            if (entry == null || entry.BlobName == null)
+            {
+                return;
+            }
+            /*
+            try
+            {
+                if (displaycache.ContainsKey(entry.BlobName))
+                {
+                    displaycache.TryGetValue(entry.BlobName, out BitmapSource imgsource);
+                    entry.ImageURI = imgsource;
+                    return;
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("nothin in cache");
+            }
+            */
+            // issue with cache so... whatever
+            if (_storageService.PackageFamilyName == "Microsoft.ArthurProduct_8wekyb3d8bbwe")
+            {
+                _storageService.Config.Token = _xblConfig.Token;
+                var allatoms = await _storageService.GetBlobAtoms(entry.BlobName);
+                string atomvalue = "";
+                foreach (var atom in allatoms.Atoms)
+                {
+                    if (atom.Key == "THUMB")
+                    {
+                        atomvalue = atom.Value;
+                        break;
+                    }
+                }
+                if (atomvalue != "" && entry != null)
+                {
+                    byte[] atomData = await _storageService.DownloadAtomAsync(atomvalue);
+                    PngBitmapDecoder decoder = new PngBitmapDecoder(new MemoryStream(atomData), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                    BitmapSource bms = decoder.Frames[0];
+                    entry.ImageURI = bms;
+                    //displaycache.Add(entry.BlobName, bms);
+                }
+            }
+        }
         public void SelectedItemChanged(object args)
         {
             SelectedBlob = args as SavedBlobsViewModel;
