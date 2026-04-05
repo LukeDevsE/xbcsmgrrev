@@ -29,10 +29,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Placeholderstuff\mxb1.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="xboxcloudicon.ico" />
   </ItemGroup>
 
@@ -51,12 +47,6 @@
     <Folder Include="Converters\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="ViewModels\Controls\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Placeholderstuff\mxb1.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
