@@ -5,8 +5,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using XboxCsMgr.Client.ViewModels.Controls;
 using XboxCsMgr.XboxLive;
 using XboxCsMgr.XboxLive.Model.TitleStorage;
@@ -83,7 +86,41 @@ namespace XboxCsMgr.Client.ViewModels
                 {
                     foreach (TitleStorageBlobMetadata entry in blobMetadataResult.Blobs)
                     {
-                        _saveData.Add(new SavedBlobsViewModel(_storageService, entry));
+                        SavedBlobsViewModel sbvm = new SavedBlobsViewModel(_storageService, entry);
+                        if (_storageService.PackageFamilyName == "Microsoft.ArthurProduct_8wekyb3d8bbwe")
+                        {
+                            sbvm.ShowFolderIcon = Visibility.Collapsed;
+                            sbvm.ShowImage = Visibility.Visible;
+                        }
+                        _saveData.Add(sbvm);
+                    }
+                }
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+                foreach (SavedBlobsViewModel entry in _saveData)
+                {
+                    if (entry == null)
+                    {
+                        break;
+                    }
+                    if (_storageService.PackageFamilyName == "Microsoft.ArthurProduct_8wekyb3d8bbwe")
+                    {
+                        var allatoms = await _storageService.GetBlobAtoms(entry.BlobName);
+                        string atomvalue = "";
+                        foreach (var atom in allatoms.Atoms)
+                        {
+                            if (atom.Key == "THUMB")
+                            {
+                                atomvalue = atom.Value;
+                                break;
+                            }
+                        }
+                        if (atomvalue != "" && entry != null)
+                        {
+                            byte[] atomData = await _storageService.DownloadAtomAsync(atomvalue);
+                            PngBitmapDecoder decoder = new PngBitmapDecoder(new MemoryStream(atomData), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                            BitmapSource bms = decoder.Frames[0];
+                            entry.ImageURI = bms;
+                        }
                     }
                 }
             }
@@ -115,6 +152,7 @@ namespace XboxCsMgr.Client.ViewModels
             bool? res = dlg.ShowDialog();
             if (res == true)
             {
+                Debug.WriteLine(SelectedAtom.AtomName.ToString());
                 byte[] atomData = await _storageService.DownloadAtomAsync(atom);
                 await File.WriteAllBytesAsync(dlg.FileName, atomData);
             }

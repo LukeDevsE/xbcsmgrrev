@@ -45,8 +45,9 @@
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type vmc:SavedBlobsViewModel}" ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Height="20" ToolTip="{Binding BlobName}">
-                            <ContentControl Template="{Binding Converter={StaticResource HierarchyNodeToIconConverter}}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" ToolTip="{Binding BlobName}">
+                            <Image Source="{Binding ImageURI}" Stretch="Uniform" Width="32" Height="32" Visibility="{Binding ShowImage}"/>
+                            <ContentControl Template="{Binding Converter={StaticResource HierarchyNodeToIconConverter}}" Visibility="{Binding ShowFolderIcon}" />
                             <TextBlock Text="{Binding BlobDisplayName}" FontSize="12"/>
                             <StackPanel.ContextMenu>
                                 <ContextMenu>

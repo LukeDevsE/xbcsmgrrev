@@ -1,12 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing.Printing;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using XboxCsMgr.XboxLive.Model.TitleStorage;
 using XboxCsMgr.XboxLive.Services;
 
 namespace XboxCsMgr.Client.ViewModels.Controls
 {
-    public class SavedBlobsViewModel : TreeViewItemViewModel
+    public class SavedBlobsViewModel : TreeViewItemViewModel, INotifyPropertyChanged
     {
         private TitleStorageService _storageService;
         private TitleStorageBlobMetadata _blobMetadata;
@@ -20,6 +24,34 @@ namespace XboxCsMgr.Client.ViewModels.Controls
         {
             get => _blobMetadata.FileName;
         }
+        private Visibility _ShowFolderIcon = Visibility.Visible;
+        public Visibility ShowFolderIcon
+        {
+            get => _ShowFolderIcon;
+            set
+            {
+                _ShowFolderIcon = value;
+                OnPCImg("ShowFolderIcon");
+            }
+        }
+        private Visibility _ShowImage = Visibility.Collapsed;
+        public Visibility ShowImage {
+            get => _ShowImage;
+            set
+            {
+                _ShowImage = value;
+                OnPCImg("ShowImage");
+            }
+        }
+        private ImageSource? _ImageURI;
+        public ImageSource? ImageURI 
+        { get => _ImageURI;
+            set
+            {
+                _ImageURI = value;
+                OnPCImg("ImageURI");
+            }
+        }
         public string BlobDisplayName
         {
             get
@@ -32,7 +64,7 @@ namespace XboxCsMgr.Client.ViewModels.Controls
                 else
                 {
                     return _blobMetadata.FileName;
-                }  
+                }
             }
         }
 
@@ -40,6 +72,11 @@ namespace XboxCsMgr.Client.ViewModels.Controls
         {
             _storageService = storageService;
             _blobMetadata = blobMetadata;
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPCImg(string varname)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(varname));
         }
 
         protected override async void LoadChildren()

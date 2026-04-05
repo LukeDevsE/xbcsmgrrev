@@ -8,7 +8,6 @@ namespace XboxCsMgr.Client.ViewModels
 {
     public interface IDialogFactory
     {
-        LoginViewModel CreateLoginDialog();
     }
 
     /// <summary>
@@ -36,13 +35,6 @@ namespace XboxCsMgr.Client.ViewModels
         {
             get => _saveView;
             set => SetAndNotify(ref this._saveView, value);
-        }
-
-        private LoginViewModel? _loginView;
-        public LoginViewModel? LoginView
-        {
-            get => _loginView;
-            set => SetAndNotify(ref this._loginView, value);
         }
 
         public ShellViewModel(IWindowManager windowManager, IDialogFactory dialogFactory, IEventAggregator events)

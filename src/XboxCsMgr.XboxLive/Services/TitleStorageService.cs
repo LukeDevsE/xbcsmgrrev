@@ -13,7 +13,7 @@ namespace XboxCsMgr.XboxLive.Services
     public class TitleStorageService : XboxLiveService
     {
         private string ServiceConfigurationId;
-        private string PackageFamilyName;
+        public string PackageFamilyName;
 
         private const int MinBlockUploadSize = 1024;
         private const int MaxBlockUploadSize = 4 * 1024 * 1024;
