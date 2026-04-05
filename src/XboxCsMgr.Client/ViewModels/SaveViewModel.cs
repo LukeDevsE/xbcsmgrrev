@@ -146,7 +146,7 @@ namespace XboxCsMgr.Client.ViewModels
             if (_storageService.PackageFamilyName == "Microsoft.ArthurProduct_8wekyb3d8bbwe")
             {
                 _storageService.Config.Token = _xblConfig.Token;
-                var allatoms = await _storageService.GetBlobAtoms(entry.BlobName);
+                var allatoms = await GetBlobAtomsRetry(entry.BlobName);
                 string atomvalue = "";
                 foreach (var atom in allatoms.Atoms)
                 {
@@ -166,12 +166,25 @@ namespace XboxCsMgr.Client.ViewModels
                 }
             }
         }
+        private async Task<TitleStorageAtomMetadataResult> GetBlobAtomsRetry(string BlobName)
+        {
+            try
+            {
+                var allatoms = await _storageService.GetBlobAtoms(BlobName);
+                return allatoms;
+            }
+            catch
+            {
+                Debug.WriteLine("something happened, retrying with this scuffed method");
+                var allatoms = await GetBlobAtomsRetry(BlobName);
+                return allatoms;
+            }
+        }
         public void SelectedItemChanged(object args)
         {
             SelectedBlob = args as SavedBlobsViewModel;
             SelectedAtom = args as SavedAtomsViewModel;
         }
-
         public async void Download()
         {
             if (SelectedAtom == null)
@@ -209,11 +222,48 @@ namespace XboxCsMgr.Client.ViewModels
                 {
                     prg.downtxt.Text = "Downloading " + atom.Key.ToString();
                     byte[] atomData = await _storageService.DownloadAtomAsync(atom.Value);
-                    await File.WriteAllBytesAsync(Path.Join(fbd.SelectedPath,atom.Key), atomData);
+                    File.WriteAllBytes(Path.Join(fbd.SelectedPath, atom.Key), atomData);
                     prg.prgbar.Value++;
                 }
                 prg.Close();
             }
+        }
+        public async void ThreadedDownloadFolder()
+        {
+            if (SelectedBlob == null)
+                return;
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            var res = fbd.ShowDialog();
+            if (res.HasFlag(DialogResult.OK))
+            {
+                var allatoms = await _storageService.GetBlobAtoms(SelectedBlob.BlobName);
+                Progress prg = new Progress();
+                prg.downtxt.Text = "Downloading " + SelectedBlob.BlobDisplayName;
+                prg.prgbar.Maximum = allatoms.Atoms.Count;
+                prg.prgbar.Value = 0;
+                prg.Show();
+                foreach (var atom in allatoms.Atoms)
+                {
+                    Thread thread = new Thread(delegate ()
+                    {
+                        ThreadDownload(atom,prg,fbd);
+                    });
+                    thread.Start();
+                }
+            }
+        }
+        public async void ThreadDownload(KeyValuePair<string,string> atomitem, Progress prg, FolderBrowserDialog fbd)
+        {
+           byte[] atomData = await _storageService.DownloadAtomAsync(atomitem.Value);
+           await File.WriteAllBytesAsync(Path.Join(fbd.SelectedPath, atomitem.Key), atomData);
+            prg.Dispatcher.Invoke(() =>
+            {
+                prg.prgbar.Value++;
+                if (prg.prgbar.Maximum <= prg.prgbar.Value)
+                {
+                    prg.Close();
+                }
+            });
         }
         public async void Upload()
         {

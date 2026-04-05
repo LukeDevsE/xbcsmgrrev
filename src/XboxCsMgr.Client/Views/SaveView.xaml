@@ -51,7 +51,7 @@
                             <TextBlock Text="{Binding BlobDisplayName}" FontSize="12"/>
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Download" Command="{s:Action DownloadFolder}"/>
+                                    <MenuItem Header="Download" Command="{s:Action ThreadedDownloadFolder}"/>
                                 </ContextMenu>
                             </StackPanel.ContextMenu>
                         </StackPanel>
