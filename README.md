@@ -9,8 +9,9 @@ Xbox Connected Storage Manager Revived
 ## Todo
 - [x] Replace the login system with a code based system to be easier for the end user.
 - [x] Make the folder (blob) name accurate
-- [ ] Save refresh token somewhere, so you dont need to keep logging in.
+- [x] Save refresh token somewhere, so you dont need to keep logging in.
 - [ ] Make better looking ui
+- [ ] native linux support
 
 ## Requirements
 - Windows (wine on linux might work too)
