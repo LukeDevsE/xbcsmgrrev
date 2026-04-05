@@ -11,11 +11,6 @@ Xbox Connected Storage Manager Revived
 - [x] Make the folder (blob) name accurate
 - [ ] Save refresh token somewhere, so you dont need to keep logging in.
 - [ ] Make better looking ui
-## How to login
-1. press the Open Link button on the dialog when you open the program.
-2. Click authorize
-3. enter the code after ?code= and press Ok
-4. you are now logged into xbcsmgrr (anytime you close it, you will have to log back in)
 
 ## Requirements
 - Windows (wine on linux might work too)
@@ -39,3 +34,4 @@ I believe that everyone has the right to access their game save data on the game
 ## Credits/References
 - [XboxAuthNet](https://github.com/AlphaBs/XboxAuthNet)
 - [Prism Launcher for OAuth](https://prismlauncher.org/)
+- [Original xbcsmgr](https://github.com/billynothingelse/xbcsmgr)
