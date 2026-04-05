@@ -159,9 +159,12 @@ namespace XboxCsMgr.Client.ViewModels
                 if (atomvalue != "" && entry != null)
                 {
                     byte[] atomData = await _storageService.DownloadAtomAsync(atomvalue);
-                    PngBitmapDecoder decoder = new PngBitmapDecoder(new MemoryStream(atomData), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-                    BitmapSource bms = decoder.Frames[0];
-                    entry.ImageURI = bms;
+                    if (atomData.Length > 0)
+                    {
+                        PngBitmapDecoder decoder = new PngBitmapDecoder(new MemoryStream(atomData), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
+                        BitmapSource bms = decoder.Frames[0];
+                        entry.ImageURI = bms;
+                    }
                     //displaycache.Add(entry.BlobName, bms);
                 }
             }
